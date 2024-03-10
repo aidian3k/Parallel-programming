@@ -11,6 +11,7 @@
 
 int n;
 double* vector;
+int processes_ready_counter = 0;
 const char* file_name = "c1";
 
 void handle_usr1_signal(int signal_number) {
@@ -38,6 +39,10 @@ void handle_usr1_signal(int signal_number) {
     detach_results_indexes_from_process(index_array, results);
 }
 
+void handle_usr2_signal(int signal_number) {
+  processes_ready_counter++;
+}
+
 int main(int argc, char **argv) {
     check_validity_of_input_arguments(argc);
     n = atoi(argv[1]);
@@ -49,6 +54,14 @@ int main(int argc, char **argv) {
     pid_t current_process_id;
     pid_t* created_process_ids = calloc(n, sizeof(pid_t));
     int created_processes_counter = 0;
+
+    struct sigaction process_ready_action;
+    sigset_t block_mask;
+    sigemptyset (&block_mask);
+    process_ready_action.sa_mask = block_mask;
+    process_ready_action.sa_flags = 0;
+    process_ready_action.sa_handler = handle_usr2_signal;
+    sigaction (SIGUSR2, &process_ready_action, 0);
 
     for(int i = 0; i < n; ++i) {
         current_process_id = fork();
@@ -65,6 +78,8 @@ int main(int argc, char **argv) {
             setup_action.sa_flags = 0;
             setup_action.sa_handler = handle_usr1_signal;
             sigaction (SIGUSR1, &setup_action, 0);
+
+            kill(getppid(), SIGUSR2);
             pause();
 
             return EXIT_SUCCESS;
@@ -94,7 +109,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    sleep(1);
+    while(processes_ready_counter != n) {}
 
     send_signal_to_child_processes(created_process_ids, n, SIGUSR1);
     wait_for_child_processes_to_stop(n);
