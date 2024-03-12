@@ -8,6 +8,7 @@
 #include "includes/vector_helpers.h"
 #include "includes/signal_helpers.h"
 #include "includes/validators.h"
+#include <time.h>
 
 int n;
 double* vector;
@@ -44,12 +45,16 @@ void handle_usr2_signal(int signal_number) {
 }
 
 int main(int argc, char **argv) {
+    struct timespec start, end;
+
     check_validity_of_input_arguments(argc);
     n = atoi(argv[1]);
     check_validity_of_number_of_processes(n);
     
     int vector_size = 0;
     vector = read_vector_from_file(argv[2], &vector_size);
+
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
     pid_t current_process_id;
     pid_t* created_process_ids = calloc(n, sizeof(pid_t));
@@ -109,14 +114,20 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    while(processes_ready_counter != n) {}
+    // while(processes_ready_counter != n) {}
+    usleep(1000); // zatrzymanie na 0,001 sekundy
 
     send_signal_to_child_processes(created_process_ids, n, SIGUSR1);
     wait_for_child_processes_to_stop(n);
     
     double final_sum = calculate_final_sum_from_array(results, n);
 
-    printf("The final results of the sum is: %g", final_sum);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+
+    double execution_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+
+    printf("The final results of the sum is: %g\n", final_sum);
+    printf("Time:  %f\n", execution_time);
     
     detach_results_indexes_from_process(index_array, results);
     delete_memory_segment(results_memory_id);

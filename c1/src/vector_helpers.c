@@ -3,10 +3,12 @@
 #include <stdlib.h>
 
 double calculate_range_sum(double* vector, int staring_index, int ending_index) {
-  double sum = 0;
-
-  for(int i = staring_index; i < ending_index; ++i) {
-    sum += vector[i];
+  double sum;
+  for(int j=0; j<1000000; j++) {
+    sum = 0;
+    for(int i = staring_index; i < ending_index; ++i) {
+      sum += vector[i];
+    }
   }
 
   return sum;
