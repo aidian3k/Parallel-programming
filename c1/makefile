@@ -1,4 +1,4 @@
-CC = cc
+CC = gcc
 
 SRC_DIR = src
 INCLUDES_DIR = includes

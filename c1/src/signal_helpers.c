@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/_types/_key_t.h>
 #include <sys/shm.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <signal.h>
 #include "includes/signal_helpers.h"
+#include <sys/types.h>
 
 void send_signal_to_child_processes(int* created_processes_ids, int number_of_processes, int signal_number) {
   for(int i = 0; i < number_of_processes; ++i) {
