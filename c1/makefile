@@ -18,5 +18,12 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 
 .PHONY: clean
 
+without_concurency:
+	$(CC) -o without_concurency without_concurency/without_concurency.c
+
+gen:
+	$(CC) -o gen generator/gen.c
+
 clean:
 	rm -rf $(BUILD_DIR)/*.o $(TARGET)
+

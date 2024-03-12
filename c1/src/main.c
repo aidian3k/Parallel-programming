@@ -115,7 +115,10 @@ int main(int argc, char **argv) {
     }
 
     // while(processes_ready_counter != n) {}
-    usleep(1000); // zatrzymanie na 0,001 sekundy
+    // Disabled because it did not work on all computers(kept the implementation though to show the idea)
+    // Sometimes it works somtimes not
+    
+    usleep(1000); // wait for 0,001 seconds
 
     send_signal_to_child_processes(created_process_ids, n, SIGUSR1);
     wait_for_child_processes_to_stop(n);

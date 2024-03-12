@@ -29,11 +29,6 @@ int main(int argc, char **argv) {
 		vector[i] = atof(buffor);
 	}
 	fclose(f);
-	// printf("v = [ ");
-	// for(i=0; i<n; i++) {
-	// 	printf("%f ", vector[i]);
-	// }
-	// printf("]\n");
 
 	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
@@ -47,8 +42,6 @@ int main(int argc, char **argv) {
 
 	printf("The final results of the sum is: %g\n", final_sum);
     printf("Time:  %f\n", execution_time);
-
-
 
 	return 0;
 }
