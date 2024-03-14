@@ -1,3 +1,3 @@
-c*/.idea
-c*/*build/*
-c*/*.DS_STORE
+**/c_*/.idea
+**/c_*/build/
+**/c_*/.DS_STORE
