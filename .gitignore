@@ -1,5 +1,5 @@
 # Ignoring unwanted files
 **/build/
-**/idea/
+**/.idea/
 **/.DS_Store
 *.o
