@@ -6,24 +6,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class Matrix {
+public final class Matrix {
     private final int numberOfColumns;
     private final int numberOfRows;
     private final double[][] matrixData;
-    private double frobeniusNorm;
+    private double frobeniusNormSum;
 
     public Matrix(int numberOfRows, int numberOfColumns) {
         this.numberOfColumns = numberOfColumns;
         this.numberOfRows = numberOfRows;
         this.matrixData = new double[numberOfRows][numberOfColumns];
-        this.frobeniusNorm = 0.0;
+        this.frobeniusNormSum = 0;
     }
 
     public Matrix(int numberOfColumns, int numberOfRows, double[][] matrixData) {
         this.numberOfColumns = numberOfColumns;
         this.numberOfRows = numberOfRows;
         this.matrixData = matrixData;
-        this.frobeniusNorm = 0.0;
+        this.frobeniusNormSum = 0;
     }
 
     public int getNumberOfColumns() {
@@ -34,12 +34,16 @@ public class Matrix {
         return numberOfRows;
     }
 
+    public double getMatrixElement(int row, int column) {
+        return matrixData[row][column];
+    }
+
     public void setMatrixElement(int rowNum, int colNum, double value) {
         matrixData[rowNum][colNum] = value;
     }
 
-    public double getMatrixElement(int row, int column) {
-        return matrixData[row][column];
+    public double getFrobeniusNorm() {
+        return Math.sqrt(frobeniusNormSum);
     }
 
     public void printMatrix() {
@@ -49,7 +53,7 @@ public class Matrix {
 
         for (int i = 0; i < numberOfRows; ++i) {
             for (int j = 0; j < numberOfColumns; ++j) {
-                System.out.print(String.format("%g ", getMatrixElement(i, j)));
+                System.out.printf("%g ", getMatrixElement(i, j));
             }
 
             System.out.println();
@@ -76,57 +80,57 @@ public class Matrix {
         validateMatrixMultiplication(firstMatrix, secondMatrix);
 
         final Matrix outputMatrix = new Matrix(firstMatrix.getNumberOfRows(), secondMatrix.getNumberOfColumns());
-        final ExecutorService multiplyThreadPool = Executors.newFixedThreadPool(numberOfThreads);
-        final int singleThreadRowStep = firstMatrix.getNumberOfRows() / numberOfThreads;
+        final Thread[] threadPool = new Thread[numberOfThreads];
+        double threadFrobeniusNormTask = 0;
+        final int cellsOfOutputMatrix = outputMatrix.getNumberOfColumns() * outputMatrix.getNumberOfRows();
+        final int cellsPerThread = cellsOfOutputMatrix / numberOfThreads;
 
         for (int i = 0; i < numberOfThreads; ++i) {
             final int currentIndex = i;
 
             final Runnable singleThreadMultiplyTask = () -> {
-                int startingRow = currentIndex * singleThreadRowStep;
-                int endingRow = currentIndex == numberOfThreads - 1 ? firstMatrix.getNumberOfRows() : (currentIndex + 1) * singleThreadRowStep;
+                double frobeniusThreadTaskSum = 0;
+                final int startingThreadWorkCell = currentIndex * cellsPerThread;
+                final int endingThreadWorkCell = currentIndex == numberOfThreads - 1 ? cellsOfOutputMatrix : (currentIndex + 1) * cellsPerThread;
 
-                for (int row = startingRow; row < endingRow; ++row) {
-                    for (int column = 0; column < secondMatrix.getNumberOfColumns(); ++column) {
-                        double elementValue = 0;
+                for(int cell = startingThreadWorkCell; cell < endingThreadWorkCell; ++cell) {
+                    int row = cell / outputMatrix.getNumberOfColumns();
+                    int column = cell %  outputMatrix.getNumberOfColumns();
+                    double elementValue = 0;
 
-                        for (int k = 0; k < firstMatrix.getNumberOfColumns(); ++k) {
-                            elementValue += firstMatrix.getMatrixElement(row, k) * secondMatrix.getMatrixElement(k, column);
-                        }
-
-                        synchronized (outputMatrix) {
-                            outputMatrix.setMatrixElement(row, column, elementValue);
-                            outputMatrix.addElementToFrobenius(elementValue);
-                        }
+                    for (int k = 0; k < firstMatrix.getNumberOfColumns(); ++k) {
+                        elementValue += firstMatrix.getMatrixElement(row, k) * secondMatrix.getMatrixElement(k, column);
                     }
+
+                    outputMatrix.setMatrixElement(row, column, elementValue);
+                    frobeniusThreadTaskSum += Math.pow(elementValue, 2);
                 }
+
+                outputMatrix.addCalculatedFrobeniusTaskSumToSum(frobeniusThreadTaskSum);
             };
 
-            multiplyThreadPool.execute(singleThreadMultiplyTask);
+            threadPool[i] = new Thread(singleThreadMultiplyTask);
+            threadPool[i].start();
         }
 
-        multiplyThreadPool.shutdown();
-
-        try {
-            multiplyThreadPool.awaitTermination(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException ex) {
+        for(int i = 0; i < numberOfThreads; ++i) {
+            try {
+                threadPool[i].join();
+            } catch(InterruptedException interruptedException) {
+                System.err.println("There was an interruption error during joining threadPool!");
+            }
         }
-
 
         return outputMatrix;
     }
 
-    private synchronized void addElementToFrobenius(double element) {
-        frobeniusNorm += Math.pow(element, 2);
+    private synchronized void addCalculatedFrobeniusTaskSumToSum(double singleFrobeniusTaskOutputSum) {
+        this.frobeniusNormSum += singleFrobeniusTaskOutputSum;
     }
 
-    public static void validateMatrixMultiplication(Matrix firstMatrix, Matrix secondMatrix) {
+    private static void validateMatrixMultiplication(Matrix firstMatrix, Matrix secondMatrix) {
         if (firstMatrix.getNumberOfColumns() != secondMatrix.getNumberOfRows()) {
             throw new IllegalStateException("There should not be situation in which first number rows are different from second matrix columns while multiplying!");
         }
-    }
-
-    public double getFrobeniusNorm() {
-        return Math.sqrt(frobeniusNorm);
     }
 }
