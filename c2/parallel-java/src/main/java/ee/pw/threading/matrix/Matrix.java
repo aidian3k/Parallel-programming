@@ -44,7 +44,6 @@ public final class Matrix {
 
         final Matrix outputMatrix = new Matrix(firstMatrix.getNumberOfRows(), secondMatrix.getNumberOfColumns());
         final Thread[] threadPool = new Thread[numberOfThreads];
-        double threadFrobeniusNormTask = 0;
         final int cellsOfOutputMatrix = outputMatrix.getNumberOfColumns() * outputMatrix.getNumberOfRows();
         final int cellsPerThread = cellsOfOutputMatrix / numberOfThreads;
 
