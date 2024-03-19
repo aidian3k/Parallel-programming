@@ -24,13 +24,18 @@ public class Main {
         secondMatrix.printMatrix();
         System.out.println();
 
+        long start = System.currentTimeMillis();
         final Matrix resultMatrix = Matrix.multiplyMatrixesParallel(firstMatrix, secondMatrix, numberOfThreads);
+        long finish = System.currentTimeMillis();
+
+        long timeElapsed = finish - start;
 
         System.out.println("Result matrix after multiplying: ");
         resultMatrix.printMatrix();
         System.out.println();
 
         System.out.printf("Frobenius value of the given matrix is: %g%n", resultMatrix.getFrobeniusNorm());
+        System.out.println("Time elapsed: " + timeElapsed + "ms");
     }
 
     private static void validateInputArguments(String... args) {
