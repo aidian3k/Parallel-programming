@@ -1,4 +1,6 @@
 CC = gcc
+CFLAGS = -Wall -Wextra -pthread
+LDFLAGS = -lm
 
 SRC_DIR = src
 INCLUDES_DIR = includes
@@ -11,7 +13,7 @@ DEPS := $(wildcard $(SRC_DIR)/$(INCLUDES_DIR)/*.h)
 TARGET = c2
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -26,4 +28,3 @@ gen:
 
 clean:
 	rm -rf $(BUILD_DIR)/*.o $(TARGET)
-

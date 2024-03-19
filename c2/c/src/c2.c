@@ -27,7 +27,11 @@ int main(int argc, char **argv) {
   print_matrix(second_matrix);
   printf("\n");
 
+  struct timespec start, end;
+
+  clock_gettime(CLOCK_MONOTONIC_RAW, &start);
   multiply_matrixes_parrarel(number_of_threads);
+  clock_gettime(CLOCK_MONOTONIC_RAW, &end);
 
   printf("Printing result multiply matrix: B\n");
   print_matrix(multiply_result_matrix);
@@ -35,6 +39,10 @@ int main(int argc, char **argv) {
 
   printf("Frobenius sum of the multiplied array is: %g\n",
          sqrt(multiply_matrix_squared_sum));
+
+  double execution_time_ms = (end.tv_sec - start.tv_sec) * 1000.0;
+  execution_time_ms += (end.tv_nsec - start.tv_nsec) / 1000000.0; 
+  printf("Execution time: %.2f ms\n", execution_time_ms);
 
   return EXIT_SUCCESS;
 }
