@@ -17,8 +17,8 @@ class MatrixMultiplicationServer:
         self.__server_manager.register(QueueNames.TASKS_QUEUE_NAME, callable=lambda: self.__tasks)
 
     def __create_queues(self):
-        self.__results: Queue[SingleTask] = Queue()
-        self.__tasks: Queue[SingleResult] = Queue()
+        self.__results: Queue[SingleResult] = Queue()
+        self.__tasks: Queue[SingleTask] = Queue()
 
     def start_server(self):
         self.__server_manager.get_server().serve_forever()

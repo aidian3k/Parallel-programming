@@ -1,9 +1,9 @@
 def read_vector_of_file_path(vector_file_path: str) -> list[float]:
     with open(vector_file_path, "r") as vector_file:
-        number_of_columns: int = int(vector_file.read())
-        int(vector_file.read())
+        number_of_columns: int = int(vector_file.readline())
+        int(vector_file.readline())
 
-        return [float(vector_file.read()) for _ in range(number_of_columns)]
+        return [float(vector_file.readline()) for _ in range(number_of_columns)]
 
 
 def read_matrix_of_file_path(matrix_file_path: str) -> list[list[float]]:
@@ -16,7 +16,7 @@ def read_matrix_of_file_path(matrix_file_path: str) -> list[list[float]]:
             single_row = []
 
             for column in range(number_of_columns):
-                single_row.append(float(matrix_file.read()))
+                single_row.append(float(matrix_file.readline()))
 
             read_matrix.append(single_row)
 

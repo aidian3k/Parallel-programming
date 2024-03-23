@@ -19,14 +19,15 @@ class MatrixMultiplicationWorker:
             self.__processes[process_number].join()
     
     def __register_queues(self) -> None:
-        self.__results_queue: Queue[SingleResult] = self.__manager.results_queue()
         self.__tasks_queue: Queue[SingleTask] = self.__manager.tasks_queue()
+        self.__results_queue: Queue[SingleResult] = self.__manager.results_queue()
     
     def __initialize_processes(self) -> None:
         self.__processes: list[Process] = []
         
-        for process_index in range(cpu_count()):
-            current_process: Process = Process(target=execute_single_work, args=(self.__tasks_queue, self.__tasks_queue))
+        #TODO change the number of cpu_count
+        for process_index in range(1):
+            current_process: Process = Process(target=execute_single_work, args=(self.__tasks_queue, self.__results_queue))
             self.__processes.append(current_process)
         
     

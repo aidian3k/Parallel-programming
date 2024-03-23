@@ -1,4 +1,5 @@
 import sys
+import time
 
 from client import MatrixMultiplicationClient
 from helpers.validation_helpers import ValidationHelpers
@@ -14,6 +15,7 @@ if __name__ == "__main__":
     number_of_tasks: int = int(sys.argv[5])
     
     client: MatrixMultiplicationClient = MatrixMultiplicationClient(matrix_file_path, vector_file_path, ip_address, port, number_of_tasks=number_of_tasks)
+    time.sleep(1)
     worker: MatrixMultiplicationWorker = MatrixMultiplicationWorker(ip_address, port)
     
     worker.start_working()

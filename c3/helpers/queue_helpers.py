@@ -15,7 +15,7 @@ class SingleTask:
 
 
 class SingleResult:
-    def __init__(self, starting_row: int, ending_row: int, single_result: list[list[float]]):
+    def __init__(self, starting_row: int, ending_row: int, single_result: list[float]):
         self.starting_row = starting_row
         self.ending_row = ending_row
         self.single_result = single_result
@@ -32,11 +32,15 @@ def get_base_queue_manager(ip_address: str = "127.0.0.1", port: int = 8080,
 def execute_single_work(tasks_queue: Queue, results_queue: Queue) -> None:
     while not tasks_queue.empty():
         current_task: SingleTask = tasks_queue.get()
-        current_submatrix_result: list[list[float]] = []
+        current_submatrix_result: list[float] = []
         
         for row in range(len(current_task.matrix_rows)):
             current_row = current_task.matrix_rows[row]
-            single_row_result: list[float] = [current_row[i] * current_task.vector[i] for i in range(len(current_task.vector))]
-            current_submatrix_result.append(single_row_result)
+            current_value: float = 0.0
+
+            for column_index in range(len(current_task.vector)):
+                current_value += current_row[column_index] * current_task.vector[column_index]
+
+            current_submatrix_result.append(current_value)
             
         results_queue.put(SingleResult(current_task.starting_row, current_task.ending_row, current_submatrix_result))
