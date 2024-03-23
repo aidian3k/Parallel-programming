@@ -1,8 +1,8 @@
 import sys
 
-from c3.client import MatrixMultiplicationClient
-from c3.helpers.validation_helpers import ValidationHelpers
-from c3.worker import MatrixMultiplicationWorker
+from client import MatrixMultiplicationClient
+from helpers.validation_helpers import ValidationHelpers
+from worker import MatrixMultiplicationWorker
 
 if __name__ == "__main__":
     ValidationHelpers.check_client_input_arguments(sys.argv)

@@ -1,9 +1,9 @@
-from c3.helpers.constants import QueueNames
-from c3.helpers.queue_helpers import QueueManager, SingleTask, SingleResult
+from helpers.constants import QueueNames
+from helpers.queue_helpers import QueueManager, SingleTask, SingleResult
 from multiprocessing import Queue
 import sys
 
-from c3.helpers.validation_helpers import ValidationHelpers
+from helpers.validation_helpers import ValidationHelpers
 
 
 class MatrixMultiplicationServer:
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     ip_address: str = sys.argv[1]
     port: int = int(sys.argv[2])
-    authorization_key: bytes = bytes(str(sys.argv[3])) if len(sys.argv) > 2 else "root"
+    authorization_key: bytes = b"root" if len(sys.argv) < 4 else bytes(sys.argv[3].encode('utf-8'))
 
     matrix_multiplication_server: MatrixMultiplicationServer = MatrixMultiplicationServer(ip_address, port,
                                                                                           authorization_key)

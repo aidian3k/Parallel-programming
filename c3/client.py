@@ -1,7 +1,7 @@
 from multiprocessing import Queue
 
-from c3.helpers.matrix_helpers import read_matrix_of_file_path, read_vector_of_file_path, get_matrix_number_of_rows
-from c3.helpers.queue_helpers import get_base_queue_manager, SingleTask, SingleResult
+from helpers.matrix_helpers import read_matrix_of_file_path, read_vector_of_file_path, get_matrix_number_of_rows
+from helpers.queue_helpers import get_base_queue_manager, SingleTask, SingleResult
 
 
 class MatrixMultiplicationClient:

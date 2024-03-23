@@ -1,8 +1,8 @@
 from multiprocessing import Queue, cpu_count, Process
 
-from c3.helpers.queue_helpers import get_base_queue_manager, SingleResult, SingleTask, execute_single_work
+from helpers.queue_helpers import get_base_queue_manager, SingleResult, SingleTask, execute_single_work
 
-        
+
 class MatrixMultiplicationWorker:
     def __init__(self, ip_address: str = "localhost", port: int = 8080, authorization_key: bytes = b"root"):
         self.__manager = get_base_queue_manager(ip_address, port, authorization_key)

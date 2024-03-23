@@ -29,7 +29,7 @@ def get_base_queue_manager(ip_address: str = "127.0.0.1", port: int = 8080,
     return QueueManager(address=(ip_address, port), authkey=authoriztion_key)
 
 
-def execute_single_work(tasks_queue: Queue[SingleTask], results_queue: Queue[SingleResult]) -> None:
+def execute_single_work(tasks_queue: Queue, results_queue: Queue) -> None:
     while not tasks_queue.empty():
         current_task: SingleTask = tasks_queue.get()
         current_submatrix_result: list[list[float]] = []
