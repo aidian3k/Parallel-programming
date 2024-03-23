@@ -43,4 +43,5 @@ def execute_single_work(tasks_queue: Queue, results_queue: Queue) -> None:
 
             current_submatrix_result.append(current_value)
             
+        print(f"Worker has calculated the single_task of len: [{len(current_submatrix_result)}]")
         results_queue.put(SingleResult(current_task.starting_row, current_task.ending_row, current_submatrix_result))

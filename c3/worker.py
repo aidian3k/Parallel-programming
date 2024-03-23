@@ -9,25 +9,29 @@ class MatrixMultiplicationWorker:
         self.__manager.connect()
         self.__register_queues()
         self.__initialize_processes()
-        
+
     def start_working(self) -> None:
         for process_number in range(len(self.__processes)):
             self.__processes[process_number].start()
-    
+
     def wait_until_processes_stop_working(self) -> None:
+        print("Waiting for processes to end")
         for process_number in range(len(self.__processes)):
-            self.__processes[process_number].join()
-    
+            self.__processes[process_number].join(timeout=5)
+
+        for process_number in range(len(self.__processes)):
+            if self.__processes[process_number].is_alive():
+                self.__processes[process_number].terminate()
+
     def __register_queues(self) -> None:
         self.__tasks_queue: Queue[SingleTask] = self.__manager.tasks_queue()
         self.__results_queue: Queue[SingleResult] = self.__manager.results_queue()
-    
+
     def __initialize_processes(self) -> None:
         self.__processes: list[Process] = []
-        
-        #TODO change the number of cpu_count
-        for process_index in range(1):
-            current_process: Process = Process(target=execute_single_work, args=(self.__tasks_queue, self.__results_queue))
+
+        for process_index in range(cpu_count()):
+            current_process: Process = Process(target=execute_single_work, args=(self.__tasks_queue
+                                                                                 , self.__results_queue))
             self.__processes.append(current_process)
         
-    
