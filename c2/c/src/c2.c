@@ -20,11 +20,11 @@ int main(int argc, char **argv) {
   second_matrix = load_matrix_from_file(argv[3]);
 
   printf("Printing first matrix: A\n");
-  print_matrix(first_matrix);
+  //print_matrix(first_matrix);
   printf("\n");
 
   printf("Printing second matrix: B\n");
-  print_matrix(second_matrix);
+  //print_matrix(second_matrix);
   printf("\n");
 
   struct timespec start, end;
@@ -34,8 +34,9 @@ int main(int argc, char **argv) {
   clock_gettime(CLOCK_MONOTONIC_RAW, &end);
 
   printf("Printing result multiply matrix: B\n");
-  print_matrix(multiply_result_matrix);
+  //print_matrix(multiply_result_matrix);
   printf("\n");
+  printf("%g", multiply_result_matrix->matrix_data[0][0]);
 
   printf("Frobenius sum of the multiplied array is: %g\n",
          sqrt(multiply_matrix_squared_sum));
