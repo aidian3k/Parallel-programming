@@ -6,7 +6,7 @@ import sys
 from helpers.validation_helpers import ValidationHelpers
 
 
-class MatrixMultiplicationServer:
+class   MatrixMultiplicationServer:
     def __init__(self, ip_address: str = "127.0.0.1", port: int = 8080, authorization_key: bytes = b"root"):
         self.__server_manager = QueueManager(address=(ip_address, port), authkey=authorization_key)
         self.__create_queues()
