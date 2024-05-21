@@ -1,4 +1,6 @@
 CC = gcc
+CFLAGS = -Wall -Wextra -std=c99 -fopenmp
+LDFLAGS = -lm
 
 SRC_DIR = src
 INCLUDES_DIR = includes
@@ -11,7 +13,7 @@ DEPS := $(wildcard $(SRC_DIR)/$(INCLUDES_DIR)/*.h)
 TARGET = c4
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -19,7 +21,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 .PHONY: clean
 
 without_concurency:
-	$(CC) -o without_concurency without_concurency/without_concurency.c
+	$(CC) -o without_concurency/without_concurency_prog without_concurency/without_concurency.c
 
 gen:
 	$(CC) -o gen generator/gen.c

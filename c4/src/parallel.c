@@ -1,8 +1,10 @@
-#include "/opt/homebrew/Cellar/libomp/18.1.2/include/omp.h"
+// #include "/opt/homebrew/Cellar/libomp/18.1.2/include/omp.h"
+#include <omp.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 typedef struct {
     bool *erastotanes_sieve_result;
@@ -18,6 +20,7 @@ Erastotanes_result *find_divison_prime_numbers(int maximum_found_number) {
     int maximum_prime_number_to_find = (int)sqrt(maximum_found_number);
     bool *erastotanes_sieve = calloc(maximum_prime_number_to_find + 1, sizeof(bool));
 
+    #pragma omp parallel for
     for (int i = 2; i <= maximum_prime_number_to_find; ++i) {
         erastotanes_sieve[i] = true;
     }
@@ -27,6 +30,7 @@ Erastotanes_result *find_divison_prime_numbers(int maximum_found_number) {
             continue;
         }
 
+        #pragma omp parallel for
         for (int j = i * i; j <= maximum_prime_number_to_find; j += i) {
             erastotanes_sieve[j] = false;
         }
@@ -34,7 +38,7 @@ Erastotanes_result *find_divison_prime_numbers(int maximum_found_number) {
 
     int number_of_primes = 0;
 
-    //#pragma omp for reduction()
+    #pragma omp parallel for reduction(+:number_of_primes)
     for (int i = 2; i <= maximum_prime_number_to_find; ++i) {
         if (erastotanes_sieve[i]) {
             number_of_primes++;
@@ -53,9 +57,13 @@ array *find_prime_numbers_of_erastotanes_result(Erastotanes_result *erastotanes_
     int number_of_elements_in_sieve = (int)sqrt(maximum_found_number);
     int prime_number_iterator = 0;
 
+    #pragma omp parallel for
     for (int i = 0; i <= number_of_elements_in_sieve; ++i) {
         if (erastotanes_result->erastotanes_sieve_result[i]) {
-            prime_numbers[prime_number_iterator++] = i;
+            #pragma omp critical
+            {
+                prime_numbers[prime_number_iterator++] = i;
+            }
         }
     }
 
@@ -79,10 +87,12 @@ array *find_final_prime_numbers_of_given_range(int maximum_found_number, array *
     int *final_prime_numbers = calloc(maximum_found_number, sizeof(int));
     int prime_counter = 0;
 
+    #pragma omp parallel for
     for (int i = 0; i < prime_numbers_of_dividers_range->size; ++i) {
         final_prime_numbers[prime_counter++] = prime_numbers_of_dividers_range->values[i];
     }
 
+    #pragma omp parallel for schedule(dynamic)
     for (int i = sieve_size + 1; i <= maximum_found_number; ++i) {
         bool is_not_divided_by_any_of_dividers = true;
         int current_number = i;
@@ -95,7 +105,10 @@ array *find_final_prime_numbers_of_given_range(int maximum_found_number, array *
         }
 
         if (is_not_divided_by_any_of_dividers) {
-            final_prime_numbers[prime_counter++] = current_number;
+            #pragma omp critical
+            {
+                final_prime_numbers[prime_counter++] = current_number;
+            }
         }
     }
 
@@ -115,16 +128,25 @@ int main(int argc, char **argv) {
 
     int maximum_found_number = atoi(argv[1]);
     int number_of_threads = atoi(argv[2]);
+    struct timespec start, end;
 
     if (maximum_found_number <= 0 || number_of_threads <= 0) {
         fprintf(stderr, "There is wrong arguments passed to the program! Maximum found number should be >=0 and number_of_threads should be >= 0");
         exit(EXIT_FAILURE);
     }
 
-    // omp_set_num_threads(number_of_threads); not working for arm architecture
+    omp_set_num_threads(number_of_threads);
+
+    clock_gettime(CLOCK_MONOTONIC, &start);
     Erastotanes_result *erastotanes_result = find_divison_prime_numbers(maximum_found_number);
     array *prime_numbers_of_dividers_range = find_prime_numbers_of_erastotanes_result(erastotanes_result, maximum_found_number);
     array *final_found_prime_numbers = find_final_prime_numbers_of_given_range(maximum_found_number, prime_numbers_of_dividers_range);
 
     write_final_results_to_file(final_found_prime_numbers);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    double execution_time_ms = (end.tv_sec - start.tv_sec) * 1000.0;
+    execution_time_ms += (end.tv_nsec - start.tv_nsec) / 1000000.0;
+    printf("Execution time: %.2f ms\n", execution_time_ms);
 }
